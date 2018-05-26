@@ -1,0 +1,15 @@
+server = '192.168.88.242'
+username='13036790254@csyxy'
+password=''
+CONTROLCHECKSTATUS = '\x20'
+ADAPTERNUM = '\x02'
+host_ip = '10.20.13.43'
+IPDOG = '\x01'
+host_name = 'GILIGILIEYE'
+PRIMARY_DNS = '58.20.127.170'
+dhcp_server = '10.20.13.254'
+AUTH_VERSION = '\x19\x00'
+mac = 0xf832e4d277b6
+host_os = 'NOTE7'
+KEEP_ALIVE_VERSION = '\xd8\x02'
+ror_version = False 

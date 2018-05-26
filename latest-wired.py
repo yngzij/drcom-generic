@@ -11,29 +11,29 @@ import random
 import traceback
 
 # CONFIG
-server = "192.168.100.150"
-username = ""
-password = ""
-host_name = "LIYUANYUAN"
-host_os = "8089D"
-host_ip = "10.30.22.17"
-PRIMARY_DNS = "114.114.114.114"
-dhcp_server = "0.0.0.0"
-mac = 0xb888e3051680
+server = '192.168.88.242'
+username = '13036790254@csyxy'
+password = '20894765'
 CONTROLCHECKSTATUS = '\x20'
-ADAPTERNUM = '\x01'
-KEEP_ALIVE_VERSION = '\xdc\x02'
+ADAPTERNUM = '\x02'
+host_ip = '10.20.13.43'
+IPDOG = '\x01'
+host_name = 'GILIGILIEYE'
+PRIMARY_DNS = '58.20.127.170'
+dhcp_server = '10.20.13.254'
+AUTH_VERSION = '\x19\x00'
+mac = 0xf832e4d277b6
+host_os = 'NOTE7'
+KEEP_ALIVE_VERSION = '\xd8\x02'
+ror_version = False
 '''
 AUTH_VERSION:
     unsigned char ClientVerInfoAndInternetMode;
-    unsigned char DogVersion;
-'''
-AUTH_VERSION = '\x0a\x00'
-IPDOG = '\x01'
-ror_version = False
+    unsigned char
 # CONFIG_END
 
-keep_alive1_mod = False #If you have trouble at KEEPALIVE1, turn this value to True
+keep_alive1_mod = False
+ # If you have trouble at KEEPALIVE1, turn this value to True
 nic_name = '' #Indicate your nic, e.g. 'eth0.2'.nic_name
 bind_ip = '0.0.0.0'
 
@@ -103,7 +103,7 @@ def challenge(svr,ran):
         except:
             log('[challenge] timeout, retrying...')
             continue
-        
+
         if address == (svr, 61440):
             break
         else:
@@ -184,14 +184,14 @@ def keep_alive_package_builder(number,random,tail,type=1,first=False):
     data += '\x2f\x12' + '\x00' * 6
     data += tail
     data += '\x00' * 4
-    #data += struct.pack("!H",0xdc02)
+    # data += struct.pack("!H",0xdc02)
     if type == 3:
         foo = ''.join([chr(int(i)) for i in host_ip.split('.')]) # host_ip
-        #CRC
+        # CRC
         # edited on 2014/5/12, filled zeros to checksum
         # crc = packet_CRC(data+foo)
         crc = '\x00' * 4
-        #data += struct.pack("!I",crc) + foo + '\x00' * 8
+        # data += struct.pack("!I",crc) + foo + '\x00' * 8
         data += crc + foo + '\x00' * 8
     else: #packet type = 1
         data += '\x00' * 16
@@ -206,9 +206,9 @@ def keep_alive_package_builder(number,random,tail,type=1,first=False):
 #     return ret
 
 def keep_alive2(*args):
-    #first keep_alive:
-    #number = number (mod 7)
-    #status = 1: first packet user sended
+    # first keep_alive:
+    # number = number (mod 7)
+    # status = 1: first packet user sended
     #         2: first packet user recieved
     #         3: 2nd packet user sended
     #         4: 2nd packet user recieved
@@ -217,7 +217,7 @@ def keep_alive2(*args):
     packet = ''
     svr = server
     ran = random.randint(0,0xFFFF)
-    ran += random.randint(1,10)   
+    ran += random.randint(1,10)
     # 2014/10/15 add by latyas, maybe svr sends back a file packet
     svr_num = 0
     packet = keep_alive_package_builder(svr_num,dump(ran),'\x00'*4,1,True)
@@ -235,9 +235,9 @@ def keep_alive2(*args):
             break
         else:
             log('[keep-alive2] recv1/unexpected',data.encode('hex'))
-    #log('[keep-alive2] recv1',data.encode('hex'))
-    
-    ran += random.randint(1,10)   
+    # log('[keep-alive2] recv1',data.encode('hex'))
+
+    ran += random.randint(1,10)
     packet = keep_alive_package_builder(svr_num, dump(ran),'\x00'*4,1,False)
     log('[keep-alive2] send2',packet.encode('hex'))
     s.sendto(packet, (svr, 61440))
@@ -252,7 +252,7 @@ def keep_alive2(*args):
     tail = data[16:20]
 
 
-    ran += random.randint(1,10)   
+    ran += random.randint(1,10)
     packet = keep_alive_package_builder(svr_num,dump(ran),tail,3,False)
     log('[keep-alive2] send3',packet.encode('hex'))
     s.sendto(packet, (svr, 61440))
@@ -266,31 +266,31 @@ def keep_alive2(*args):
     log('[keep-alive2] recv3',data.encode('hex'))
     tail = data[16:20]
     log("[keep-alive2] keep-alive2 loop was in daemon.")
-    
+
     i = svr_num
     while True:
         try:
             time.sleep(20)
             keep_alive1(*args)
-            ran += random.randint(1,10)   
+            ran += random.randint(1,10)
             packet = keep_alive_package_builder(i,dump(ran),tail,1,False)
-            #log('DEBUG: keep_alive2,packet 4\n',packet.encode('hex'))
+            # log('DEBUG: keep_alive2,packet 4\n',packet.encode('hex'))
             log('[keep_alive2] send',str(i),packet.encode('hex'))
             s.sendto(packet, (svr, 61440))
             data, address = s.recvfrom(1024)
             log('[keep_alive2] recv',data.encode('hex'))
             tail = data[16:20]
-            #log('DEBUG: keep_alive2,packet 4 return\n',data.encode('hex'))
-        
-            ran += random.randint(1,10)   
+            # log('DEBUG: keep_alive2,packet 4 return\n',data.encode('hex'))
+
+            ran += random.randint(1,10)
             packet = keep_alive_package_builder(i+1,dump(ran),tail,3,False)
-            #log('DEBUG: keep_alive2,packet 5\n',packet.encode('hex'))
+            # log('DEBUG: keep_alive2,packet 5\n',packet.encode('hex'))
             s.sendto(packet, (svr, 61440))
             log('[keep_alive2] send',str(i+1),packet.encode('hex'))
             data, address = s.recvfrom(1024)
             log('[keep_alive2] recv',data.encode('hex'))
             tail = data[16:20]
-            #log('DEBUG: keep_alive2,packet 5 return\n',data.encode('hex'))
+            # log('DEBUG: keep_alive2,packet 5 return\n',data.encode('hex'))
             i = (i+2) % 0xFF
         except:
             log('[keep_alive2] error', 'raise Exception to main()')
@@ -322,8 +322,7 @@ def mkpkt(salt, usr, pwd, mac):
 	    unsigned int unkown2;
 	    struct _tagHostInfo HostInfo;
 	    unsigned char ClientVerInfoAndInternetMode;
-	    unsigned char DogVersion;
-	};
+	    unsigned char DogVersion; 	};
     '''
     data = '\x03\x01\x00' + chr(len(usr) + 20)
     data += md5sum('\x03\x01' + salt + pwd)
@@ -464,9 +463,9 @@ def login(usr, pwd, svr):
                 continue
 
     log('[login] login sent')
-    #0.8 changed:
+    # 0.8 changed:
     return data[23:39]
-    #return data[-22:-6]
+    # return data[-22:-6]
 
 def logout(usr, pwd, svr, mac, auth_info):
     salt = challenge(svr, time.time()+random.randint(0xF, 0xFF))
@@ -544,7 +543,7 @@ def keep_alive1(salt,tail,pwd,svr):
         log('[keep-alive1] recv', data.encode('hex'))
 
 def empty_socket_buffer():
-#empty buffer for some fucking schools
+# empty buffer for some fucking schools
     log('starting to empty socket buffer')
     try:
         while True:
@@ -573,7 +572,7 @@ def main():
         except LoginException:
             continue
         log('package_tail',package_tail.encode('hex'))
-        #keep_alive1 is fucking bullshit!
+        # keep_alive1 is fucking bullshit!
         empty_socket_buffer()
         try:
             keep_alive1(SALT,package_tail,password,server)
@@ -583,7 +582,7 @@ def main():
             log('[main] error', 'something was wrong in keep_alives, do everything again')
             log(traceback.format_exc())
             time.sleep(3)
-            #empty socket buffer before relogin
+            # empty socket buffer before relogin
             empty_socket_buffer()
             continue
 
